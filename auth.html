@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Account | Login & Signup</title>
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">🛍️ MyStore</div>
+    <nav class="nav">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="cart.html">Cart 🛒 <span class="badge" id="cart-count">0</span></a></li>
+        <li id="auth-links">
+          <a href="auth.html" id="login-link">Login</a>
+          <button id="logout-btn" class="btn-link" style="display:none;">Logout</button>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Auth Container -->
+  <section class="auth-container">
+    <div class="auth-tabs">
+      <button id="show-login" class="auth-tab active">Login</button>
+      <button id="show-signup" class="auth-tab">Sign Up</button>
+    </div>
+
+    <!-- Login Form -->
+    <form id="login-form" class="auth-form">
+      <h2>Login</h2>
+      <div class="form-group">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" placeholder="you@example.com" required />
+        <small class="error" id="login-email-error"></small>
+      </div>
+      <div class="form-group">
+        <label for="login-password">Password</label>
+        <div class="password-wrapper">
+          <input type="password" id="login-password" placeholder="Enter your password" required />
+          <button type="button" class="toggle-visibility" data-target="login-password">Show</button>
+        </div>
+        <small class="error" id="login-password-error"></small>
+      </div>
+      <button type="submit" class="primary">Login</button>
+      <div class="auth-extra">
+        <a href="#" id="forgot-password-link">Forgot Password?</a>
+        <span>New here? <a href="#" id="go-to-signup">Create an account</a></span>
+      </div>
+      <small class="feedback" id="login-feedback"></small>
+    </form>
+
+    <!-- Signup Form -->
+    <form id="signup-form" class="auth-form hidden">
+      <h2>Create an account</h2>
+      <div class="form-group">
+        <label for="signup-name">Full Name</label>
+        <input type="text" id="signup-name" placeholder="Your name" required />
+        <small class="error" id="signup-name-error"></small>
+      </div>
+      <div class="form-group">
+        <label for="signup-email">Email</label>
+        <input type="email" id="signup-email" placeholder="you@example.com" required />
+        <small class="error" id="signup-email-error"></small>
+      </div>
+      <div class="form-group">
+        <label for="signup-password">Password</label>
+        <div class="password-wrapper">
+          <input type="password" id="signup-password" placeholder="Min 8 chars, A/a/0-9" required />
+          <button type="button" class="toggle-visibility" data-target="signup-password">Show</button>
+        </div>
+        <div class="strength" id="password-strength">Strength: —</div>
+        <small class="error" id="signup-password-error"></small>
+      </div>
+      <div class="form-group">
+        <label for="signup-confirm">Confirm Password</label>
+        <div class="password-wrapper">
+          <input type="password" id="signup-confirm" placeholder="Re-enter password" required />
+          <button type="button" class="toggle-visibility" data-target="signup-confirm">Show</button>
+        </div>
+        <small class="error" id="signup-confirm-error"></small>
+      </div>
+      <button type="submit" class="primary">Sign Up</button>
+      <div class="auth-extra">
+        <span>Already have an account? <a href="#" id="go-to-login">Log in</a></span>
+      </div>
+      <small class="feedback" id="signup-feedback"></small>
+    </form>
+  </section>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script>
+    // Minimal Firebase bootstrap to reflect auth state on non-auth pages
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    appId: "YOUR_APP_ID",
+  };
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  const logoutBtn = document.getElementById("logout-btn");
+  const loginLink = document.getElementById("login-link");
+  const cartCountEl = document.getElementById("cart-count");
+  const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
+  const cartCount = cartItems.reduce((sum, i) => sum + i.quantity, 0);
+  if (cartCountEl) cartCountEl.textContent = cartCount;
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      if (logoutBtn) logoutBtn.style.display = "inline-block";
+      if (loginLink) loginLink.style.display = "none";
+    } else {
+      if (logoutBtn) logoutBtn.style.display = "none";
+      if (loginLink) loginLink.style.display = "inline-block";
+    }
+  });
+
+  logoutBtn?.addEventListener("click", async () => {
+    try { await auth.signOut(); window.location.href = "auth.html"; }
+    catch (err) { alert(`Logout error: ${err.message}`); }
+  });
+  </script>
+  <!-- Auth Logic -->
+  <script src="scripts/auth.js"></script>
+</body>
+</html>
