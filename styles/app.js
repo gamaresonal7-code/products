@@ -8,9 +8,9 @@ const productGrid = document.getElementById("product-grid");
 const cartCount = document.getElementById("cart-count");
 const loading = document.getElementById("loading");
 const error = document.getElementById("error");
-let cartItems = JSON.parse(localStorage.getItem("cart")) || [];
 
-cartCount.textContent = cartItems.length;
+let cartItems = JSON.parse(localStorage.getItem("cart")) || [];
+cartCount.textContent = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
 async function fetchProducts() {
   try {
@@ -40,5 +40,16 @@ async function fetchProducts() {
     loading.style.display = "none";
     error.textContent = "Failed to load products. Please try again later.";
   }
+}
+function addToCart(product) {
+  const existing = cartItems.find(item => item.id === product.id);
+  if (existing) {
+    existing.quantity++;
+  } else {
+    cartItems.push({ ...product, quantity: 1 });
+  }
+  localStorage.setItem("cart", JSON.stringify(cartItems));
+  cartCount.textContent = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  alert("Item added to cart!");
 }
 fetchProducts();
